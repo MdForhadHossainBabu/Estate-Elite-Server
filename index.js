@@ -35,8 +35,15 @@ async function run() {
     const wishlistCollection = client
       .db('advertisement')
       .collection('wishlist');
+    const reviewCollection = client
+      .db('advertisement')
+      .collection('review');
     
     
+    app.get('/review', async (req, res) => {
+      const cursor = await reviewCollection.find().toArray();
+      res.send(cursor)
+    })
     
     // jwt related apis
 
@@ -50,7 +57,7 @@ async function run() {
 
     // verify token of middlewares
     const verifyToken = (req, res, next) => {
-      console.log('inside verify token', req.headers.authorization);
+      // console.log('inside verify token', req.headers.authorization);
       if (!req.headers.authorization) {
         return res.status(401).send({message: 'unauthorized access'})
       }
@@ -184,7 +191,7 @@ async function run() {
       res.send(cursor);
     });
 
-
+// get admin filter to email 
     app.get('/users/admin/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {
@@ -199,6 +206,7 @@ async function run() {
       res.send({admin})
     })
 
+    // delete user
     app.delete('/users/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id)};
@@ -231,7 +239,7 @@ async function run() {
       res.send(result)
     })
     
-    await client.db('admin').command({ ping: 1 });
+    // await client.db('admin').command({ ping: 1 });
     console.log(
       'Pinged your deployment. You successfully connected to MongoDB!'
     );
